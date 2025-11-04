@@ -23,6 +23,7 @@ import com.rahul.genmillenauts.userservice.entity.User;
 import com.rahul.genmillenauts.userservice.repository.OtpRepository;
 import com.rahul.genmillenauts.userservice.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -63,6 +64,7 @@ public class Userservice {
 
     // ---------------------- Verify OTP ----------------------
  // ---------------------- Verify OTP ----------------------
+    
     public String verifyOtp(String email, String mobile, String otp) {
         // Normalize mobile number if provided
         if (mobile != null) mobile = normalizeMobile(mobile);
@@ -134,7 +136,10 @@ public class Userservice {
 
         return userRepository.save(user);
     }
-
+    
+    
+    
+//login
     public LoginResponse login(String email, String mobile, String password) throws Exception {
         Optional<User> userOptional = email != null ?
                 userRepository.findByEmail(email) :
@@ -159,11 +164,13 @@ public class Userservice {
     
     //get a profile of logged in user
     public UserFullResponse getMyProfile(String email) {
-    	User user = userRepository.findByEmail(email)
-    			.orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"User Not found"));
-    	 System.out.println("Fetched user: " + user); 
-    	return UserFullResponse.fromEntity(user);
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        
+        System.out.println("Fetched user: " + user);
+        return UserFullResponse.fromEntity(user);
     }
+
     
     public UserPublicResponse getUserPublicProfile(String anyName) {
     	User user =userRepository.findByAnyName(anyName)

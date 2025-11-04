@@ -20,40 +20,56 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final CustomUserDetailsService userDetailsService; // ✅ inject this
+    private final CustomUserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
-        String token = null;
-        String username = null;
-
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-            username = jwtService.extractUsername(token);
+        String path = request.getRequestURI();
+        // ✅ 1. Skip JWT filter for public endpoints
+        if (path.startsWith("/api/auth/")) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // ✅ load userDetails from DB
-            var userDetails = userDetailsService.loadUserByUsername(username);
+        // ✅ 2. Extract token from header
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-            if (jwtService.isTokenValid(token)) {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails, // ✅ pass UserDetails here
-                                null,
-                                userDetails.getAuthorities() // ✅ get authorities from UserDetails
-                        );
+        String token = authHeader.substring(7);
+        if (token.isBlank()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-                
-                Long userId = jwtService.extractAllClaims(token).get("userId", Long.class);
-                request.setAttribute("userId", userId);
+        try {
+            String username = jwtService.extractUsername(token);
+
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                var userDetails = userDetailsService.loadUserByUsername(username);
+
+                if (jwtService.isTokenValid(token)) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails, null, userDetails.getAuthorities()
+                            );
+
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                    // Optional: store userId from token claims
+                    Long userId = jwtService.extractAllClaims(token).get("userId", Long.class);
+                    request.setAttribute("userId", userId);
+                }
             }
+        } catch (Exception e) {
+            // ✅ Don’t crash filter — just log and continue
+            System.out.println("⚠️ JWT Filter Warning: " + e.getMessage());
         }
 
         filterChain.doFilter(request, response);

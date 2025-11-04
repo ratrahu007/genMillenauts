@@ -47,7 +47,7 @@ public class User {
 
     private String fullName;
     
-    @Column(nullable = false)
+    
     private String city;
     
     @Column(nullable = false)

@@ -1,9 +1,14 @@
 package com.rahul.genmillenauts.userservice.repository;
 
-import com.rahul.genmillenauts.userservice.entity.OtpData;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.stereotype.Repository;
+
+import com.rahul.genmillenauts.userservice.entity.OtpData;
+
+import jakarta.transaction.Transactional;
 
 @Repository
 public interface OtpRepository extends JpaRepository<OtpData, Long> {
@@ -21,8 +26,12 @@ public interface OtpRepository extends JpaRepository<OtpData, Long> {
 
     Optional<OtpData> findTopByMobileAndStatusOrderByCreatedAtDesc(String mobile, String status);
 
+    @Modifying
+    @Transactional
     void deleteAllByEmailAndStatus(String email, String status);
 
+    @Modifying
+    @Transactional
     void deleteAllByMobileAndStatus(String mobile, String status);
 
     // ✅ New: verify with both OTP + email/mobile
