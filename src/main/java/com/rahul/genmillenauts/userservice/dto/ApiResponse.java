@@ -8,7 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApiResponse {
-    private String message;
+    public ApiResponse(boolean b, String string) {
+		// TODO Auto-generated constructor stub
+	}
+	private String message;
     private boolean success;
 }
 

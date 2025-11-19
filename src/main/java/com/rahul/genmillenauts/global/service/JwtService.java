@@ -12,8 +12,10 @@ import org.springframework.stereotype.Service;
 
 import com.rahul.genmillenauts.global.config.CustomUserDetails;
 
-import io.jsonwebtoken.*;
-
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 @Service
@@ -38,6 +40,20 @@ public class JwtService {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
+    
+    public String generateToken(com.rahul.genmillenauts.therapist.service.CustomTherapistDetails therapistDetails) {
+        Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+
+        return Jwts.builder()
+                .setSubject(therapistDetails.getUsername())
+                .claim("role", therapistDetails.getRoleName())
+                .claim("userId", therapistDetails.getId())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     // 🔹 Extract username
     public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();

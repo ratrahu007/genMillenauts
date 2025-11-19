@@ -1,4 +1,4 @@
-package com.rahul.genmillenauts.userservice.dto;
+package com.rahul.genmillenauts.global.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

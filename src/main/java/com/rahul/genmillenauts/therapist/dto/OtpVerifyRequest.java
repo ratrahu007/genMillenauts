@@ -1,0 +1,15 @@
+package com.rahul.genmillenauts.therapist.dto;
+
+
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class OtpVerifyRequest {
+    private String emailOrMobile;
+    private String otp;
+}

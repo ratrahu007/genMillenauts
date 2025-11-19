@@ -1,4 +1,4 @@
-package com.rahul.genmillenauts.userservice.entity;
+package com.rahul.genmillenauts.global.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,26 +17,17 @@ public class OtpData {
     private Long id;
 
     @Column(nullable = false)
-    private String otp; // OTP code sent to email or mobile
-    
-    
+    private String otp; // 6-digit OTP code
+
     private String mobile;
-    
-    
     private String email;
+
+    @Column(nullable = false)
+    private String type; // EMAIL or MOBILE
 
     @Column(nullable = false)
     private String status; // PENDING, VERIFIED, EXPIRED, INVALID
 
-    
-    private String type; // EMAIL or MOBILE
-
     private LocalDateTime createdAt;
-
     private LocalDateTime expiresAt;
-
-    @ToString.Exclude
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user; // Linked user, optional before registration
 }

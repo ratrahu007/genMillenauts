@@ -15,8 +15,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByAnyName(String anyName);
 
-    // Only allow registration if OTP status is VERIFIED
-    Optional<User> findByEmailAndOtpDataStatus(String email, String status);
-
-    Optional<User> findByMobileAndOtpDataStatus(String mobile, String status);
+   
 }

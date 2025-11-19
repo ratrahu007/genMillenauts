@@ -1,57 +1,90 @@
 package com.rahul.genmillenauts.global.exception;
 
-import java.util.HashMap;
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.server.ResponseStatusException;
 
-@ControllerAdvice
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+@RestControllerAdvice
+public class GlobalExceptionHandler {
 
-    private final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    // ✅ 1. Handle @Valid validation errors (bad request 400)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
+        List<String> errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.toList());
 
-    // ---------------- Validation errors (@Valid)
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex, HttpHeaders headers,
-            HttpStatus status, WebRequest request) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("success", false);
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("message", errors.size() == 1 ? errors.get(0) : errors);
+        body.put("path", request.getDescription(false));
 
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String message = error.getDefaultMessage();
-            errors.put(fieldName, message);
-        });
-
-        log.warn("Validation failed: {}", errors);
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
-    // ---------------- Malformed JSON / binding errors
-    
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(
-            HttpMessageNotReadableException ex, HttpHeaders headers,
-            HttpStatus status, WebRequest request) {
+    // ✅ 2. Handle ResponseStatusException (custom business exceptions like 400, 401, 409)
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Object> handleResponseStatusException(ResponseStatusException ex, WebRequest request) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("success", false);
+        body.put("status", ex.getStatusCode().value());
+        body.put("message", ex.getReason());
+        body.put("path", request.getDescription(false));
 
-        log.error("Malformed JSON request: {}", ex.getMessage());
-        return new ResponseEntity<>("Malformed JSON request: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(body, ex.getStatusCode());
     }
 
-    // ---------------- Catch-all for other exceptions
+    // ✅ 3. Handle RuntimeExceptions (covers wrapped 409 or 400)
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Object> handleRuntimeException(RuntimeException ex, WebRequest request) {
+        String message = ex.getMessage();
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        // Handle wrapped ResponseStatusException messages
+        if (message != null && message.startsWith("409 CONFLICT")) {
+            status = HttpStatus.CONFLICT;
+            message = message.substring(message.indexOf("\"") + 1, message.lastIndexOf("\""));
+        } else if (message != null && message.startsWith("400 BAD_REQUEST")) {
+            status = HttpStatus.BAD_REQUEST;
+            message = message.substring(message.indexOf("\"") + 1, message.lastIndexOf("\""));
+        }
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("success", false);
+        body.put("status", status.value());
+        body.put("message", message);
+        body.put("path", request.getDescription(false));
+
+        return new ResponseEntity<>(body, status);
+    }
+
+    // ✅ 4. Catch-all fallback for any unhandled exception
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleAllExceptions(Exception ex, WebRequest request) {
-        log.error("Exception occurred: ", ex);
-        return new ResponseEntity<>("Internal Server Error: " + ex.getMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("success", false);
+        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        body.put("message", ex.getMessage());
+        body.put("path", request.getDescription(false));
+
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

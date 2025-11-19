@@ -2,6 +2,8 @@ package com.rahul.genmillenauts.userservice.entity;
 
 import java.util.List;
 
+import com.rahul.genmillenauts.global.entity.OtpData;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -53,9 +55,7 @@ public class User {
     @Column(nullable = false)
     private boolean isOptedForOnlineMeets;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private OtpData otpData; // Link to OTP table to check verification
-
+   
     // Additional fields like role, createdAt, updatedAt can be added
     
     // One user can have multiple alert contacts

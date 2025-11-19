@@ -1,9 +1,24 @@
 package com.rahul.genmillenauts.therapist.entity;
 
-import jakarta.persistence.*;
-import java.util.*;
+import com.rahul.genmillenauts.global.config.Role;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "therapists")
 public class Therapist {
 
@@ -13,19 +28,21 @@ public class Therapist {
 
     private String fullName;
     private String email;
+    private String mobile;
+
     private String password;
     private String specialization;
     private String city;
     private double sessionPrice;
     private String bio;
     private String profilePictureUrl;
+    
+    @Enumerated(EnumType.STRING)
+    public  Role role;
+
+    
     private boolean verified = false;
 
-    @OneToMany(mappedBy = "therapist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AvailabilitySlot> slots = new ArrayList<>();
-
-    @OneToMany(mappedBy = "therapist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Booking> bookings = new ArrayList<>();
-
+   
     // Getters and Setters
 }

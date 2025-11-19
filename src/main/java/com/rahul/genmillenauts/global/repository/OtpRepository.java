@@ -1,4 +1,4 @@
-package com.rahul.genmillenauts.userservice.repository;
+package com.rahul.genmillenauts.global.repository;
 
 import java.util.Optional;
 
@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
-import com.rahul.genmillenauts.userservice.entity.OtpData;
+import com.rahul.genmillenauts.global.entity.OtpData;
 
 import jakarta.transaction.Transactional;
 
@@ -38,4 +38,8 @@ public interface OtpRepository extends JpaRepository<OtpData, Long> {
     Optional<OtpData> findByEmailAndOtpAndStatus(String email, String otp, String status);
 
     Optional<OtpData> findByMobileAndOtpAndStatus(String mobile, String otp, String status);
+
+	void deleteByEmailAndStatusNot(String email, String string);
+
+	void deleteByMobileAndStatusNot(String mobile, String string);
 }
