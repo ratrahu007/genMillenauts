@@ -15,7 +15,7 @@ public class UserFullResponse {
     private String mobile;      // contact number
     private String fullName;    // full name
     private String city;        // city of user
-    private String role;        // role (USER / ADMIN etc.)
+           // role (USER / ADMIN etc.)
 
     // ✅ Convert from entity
     public static UserFullResponse fromEntity(User user) {
@@ -24,8 +24,8 @@ public class UserFullResponse {
             user.getAnyName(),
             user.getMobile(),
             user.getFullName(),
-            user.getCity(),
-            user.getRole()
+            user.getCity()
+            
         );
     }
 }

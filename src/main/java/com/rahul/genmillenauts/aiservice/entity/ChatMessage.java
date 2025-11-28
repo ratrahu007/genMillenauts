@@ -22,7 +22,13 @@ public class ChatMessage {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String message;
+
     private boolean isBot;
-    private LocalDateTime timestamp;
+    
+    
+    private LocalDateTime createdAt;
+
 }

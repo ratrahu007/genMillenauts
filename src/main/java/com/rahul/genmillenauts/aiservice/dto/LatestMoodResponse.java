@@ -2,15 +2,13 @@ package com.rahul.genmillenauts.aiservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class MoodResult {
+public class LatestMoodResponse {
+    private int stressIndex;
     private String mood;
-    private double confidence;
-
- 
-    // getters & setters
+    private LocalDateTime time;
 }

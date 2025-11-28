@@ -6,5 +6,7 @@ import com.rahul.genmillenauts.aiservice.entity.ChatMessage;
 import com.rahul.genmillenauts.userservice.entity.User;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
-    List<ChatMessage> findByUserOrderByTimestampAsc(User user);
+    
+    
+    List<ChatMessage> findTop10ByUserOrderByCreatedAtDesc(User user);
 }
