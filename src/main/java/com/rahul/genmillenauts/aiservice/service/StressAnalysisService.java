@@ -143,30 +143,31 @@ public class StressAnalysisService {
     }
 
     // ⭐ Update daily mood aggregation
+ // ⭐ Reset daily stress (DO NOT average with previous day)
     private void updateDailyMood(User user, int stress) {
 
         LocalDate today = LocalDate.now();
 
-        DailyMood dm = moodRepo.findByUserAndDate(user, today)
-                .orElse(
-                        DailyMood.builder()
-                                .user(user)
-                                .date(today)
-                                .averageStress(stress)
-                                .overallMood("OKAY")
-                                .build()
-                );
+        // Fetch today's record OR create new
+        DailyMood dm = moodRepo.findByUserAndDate(user, today).orElse(null);
 
-        int newAvg = (dm.getAverageStress() + stress) / 2;
-        dm.setAverageStress(newAvg);
-
-        if (newAvg > 80) dm.setOverallMood("SEVERE");
-        else if (newAvg > 60) dm.setOverallMood("BAD");
-        else if (newAvg > 40) dm.setOverallMood("OKAY");
-        else dm.setOverallMood("GOOD");
+        if (dm == null) {
+            // First stress entry of the day → start fresh
+            dm = DailyMood.builder()
+                    .user(user)
+                    .date(today)
+                    .averageStress(stress)
+                    .overallMood(classifyMood(stress))
+                    .build();
+        } else {
+            // ⭐ Reset completely for new logs of the day
+            dm.setAverageStress(stress);
+            dm.setOverallMood(classifyMood(stress));
+        }
 
         moodRepo.save(dm);
     }
+
 
     // ⭐ Send alert SMS through your global message service
     private void sendAlerts(User user, int stress, String mood) {
