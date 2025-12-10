@@ -1,13 +1,22 @@
 package com.rahul.genmillenauts.therapist.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.rahul.genmillenauts.global.dto.ApiResponse;
 import com.rahul.genmillenauts.therapist.dto.TherapistProfileResponse;
 import com.rahul.genmillenauts.therapist.dto.TherapistProfileUpdateRequest;
 import com.rahul.genmillenauts.therapist.service.CustomTherapistDetails;
 import com.rahul.genmillenauts.therapist.service.TherapistService;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -35,6 +44,13 @@ public class TherapistProfileController {
         Long therapistId = therapist.getId();
         return ResponseEntity.ok(therapistService.updateProfile(therapistId, req));
     }
+    
+    
+    @GetMapping("/public")
+    public ResponseEntity<List<TherapistProfileResponse>> getAllTherapists() {
+        return ResponseEntity.ok(therapistService.getAllAvailableTherapists());
+    }
+
 
     // ---------- DELETE PROFILE ----------
     @DeleteMapping("/me")

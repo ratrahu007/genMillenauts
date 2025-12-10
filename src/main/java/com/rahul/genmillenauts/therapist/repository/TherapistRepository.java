@@ -1,5 +1,6 @@
 package com.rahul.genmillenauts.therapist.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,5 +12,8 @@ public interface TherapistRepository  extends JpaRepository<Therapist, Long> {
 	    Optional<Therapist> findByMobile(String mobile);
 	    boolean existsByEmail(String email);
 	    boolean existsByMobile(String mobile);
+	    
+	    List<Therapist> findByVerifiedTrue();
+
 
 }

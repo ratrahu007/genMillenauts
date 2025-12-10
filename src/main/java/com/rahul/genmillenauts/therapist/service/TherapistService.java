@@ -1,5 +1,7 @@
 package com.rahul.genmillenauts.therapist.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.rahul.genmillenauts.therapist.dto.TherapistProfileResponse;
@@ -52,6 +54,26 @@ public class TherapistService {
         t.setVerified(false); // soft delete
         therapistRepository.save(t);
     }
+    
+    
+    public List<TherapistProfileResponse> getAllAvailableTherapists() {
+
+        return therapistRepository.findByVerifiedTrue()
+                .stream()
+                .map(t -> TherapistProfileResponse.builder()
+                        .id(t.getId())
+                        .fullName(t.getFullName())
+                        .email(t.getEmail())
+                        .mobile(t.getMobile())
+                        .specialization(t.getSpecialization())
+                        .city(t.getCity())
+                        .bio(t.getBio())
+                        .sessionPrice(t.getSessionPrice())
+                        .profilePhotoUrl(t.getProfilePictureUrl())
+                        .build()
+                ).toList();
+    }
+
 
     // ---------- MAPPER ----------
     private TherapistProfileResponse mapToResponse(Therapist t) {

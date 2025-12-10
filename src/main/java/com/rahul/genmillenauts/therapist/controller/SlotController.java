@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rahul.genmillenauts.global.dto.ApiResponse;
+import com.rahul.genmillenauts.therapist.dto.SlotFetchRequest;
 import com.rahul.genmillenauts.therapist.dto.SlotRequest;
 import com.rahul.genmillenauts.therapist.entity.AvailabilitySlot;
 import com.rahul.genmillenauts.therapist.service.CustomTherapistDetails;
@@ -53,6 +54,29 @@ public class SlotController {
 
         } catch (Exception e) {
             log.error("❌ Error in /slots/generate: {}", e.getMessage(), e);
+            return new ApiResponse(false, e.getMessage());
+        }
+    }
+
+    
+    /**
+     * PUBLIC: USER FETCHES SLOTS FOR BOOKING
+     */
+    @PostMapping("/public/fetch")
+    public Object fetchSlotsForUsers(@RequestBody SlotFetchRequest req) {
+        try {
+        	   Long therapistId = req.getTherapistId();
+            log.info("📥 /slots/public/fetch → therapistId: {}", therapistId);
+            
+
+            List<AvailabilitySlot> slots = slotService.getSlotsForTherapist(therapistId);
+
+            log.info("📤 PUBLIC fetched {} slots for therapist {}", slots.size(), therapistId);
+
+            return slots;
+
+        } catch (Exception e) {
+            log.error("❌ Error in /slots/public/fetch: {}", e.getMessage(), e);
             return new ApiResponse(false, e.getMessage());
         }
     }
