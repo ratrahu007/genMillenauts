@@ -1,5 +1,6 @@
 package com.rahul.genmillenauts.aiservice.service;
 
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.vertexai.VertexAI;
 import com.google.cloud.vertexai.api.GenerateContentResponse;
 import com.google.cloud.vertexai.generativeai.GenerativeModel;
@@ -20,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,7 +32,7 @@ import java.util.List;
    ✔ FULLY ASYNC stress analysis
    ✔ Does not block main chat thread
    ✔ Runs in background using stressExecutor
-   ✔ Saves stress logs, daily moods, sends SMS via MessageService
+   ✔ SAFE for Railway / Render (ENV-based GCP auth)
 */
 @Service
 @RequiredArgsConstructor
@@ -49,7 +52,25 @@ public class StressAnalysisService {
 
     private static final int ALERT_THRESHOLD = 80;
 
-    // 🚀 THIS IS THE MAIN ASYNC ENTRY POINT
+    // 🔐 Load GCP credentials from ENV (Railway / Render safe)
+    private GoogleCredentials loadCredentials() {
+        try {
+            String json = System.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON");
+
+            if (json == null || json.isBlank()) {
+                throw new IllegalStateException("GOOGLE_APPLICATION_CREDENTIALS_JSON not set");
+            }
+
+            return GoogleCredentials.fromStream(
+                    new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))
+            );
+        } catch (Exception e) {
+            log.error("❌ Failed to load GCP credentials from ENV", e);
+            throw new RuntimeException("GCP authentication failed");
+        }
+    }
+
+    // 🚀 ASYNC ENTRY POINT
     @Async("stressExecutor")
     public void analyzeAsync(Long userId) {
 
@@ -99,20 +120,25 @@ public class StressAnalysisService {
         }
     }
 
-
-    // ⭐ Generate stress score using LLM
+    // ⭐ Generate stress score using Vertex AI (Gemini)
     private int generateStressScore(String text) {
 
-        try (VertexAI vertexAI = new VertexAI(PROJECT_ID, LOCATION)) {
+        GoogleCredentials credentials = loadCredentials();
+
+        try (VertexAI vertexAI = new VertexAI.Builder()
+                .setProjectId(PROJECT_ID)
+                .setLocation(LOCATION)
+                .setCredentials(credentials)
+                .build()) {
 
             GenerativeModel model = new GenerativeModel(MODEL_NAME, vertexAI);
 
             String prompt = """
                 Analyze the emotional stress level of the conversation below.
                 Return ONLY a number (0-100).
-                
+
                 Messages:
-            """ + text;
+                """ + text;
 
             GenerateContentResponse response = model.generateContent(prompt);
 
@@ -121,7 +147,8 @@ public class StressAnalysisService {
                     .getParts(0)
                     .getText();
 
-            log.info("🔍 LLM RAW OUTPUT => {}", output); // 👈
+            log.info("🔍 LLM RAW OUTPUT => {}", output);
+
             String digits = output.replaceAll("[^0-9]", "");
             if (digits.isEmpty()) return 50;
 
@@ -142,17 +169,14 @@ public class StressAnalysisService {
         return "CRISIS";
     }
 
-    // ⭐ Update daily mood aggregation
- // ⭐ Reset daily stress (DO NOT average with previous day)
+    // ⭐ Update daily mood (reset per day)
     private void updateDailyMood(User user, int stress) {
 
         LocalDate today = LocalDate.now();
 
-        // Fetch today's record OR create new
         DailyMood dm = moodRepo.findByUserAndDate(user, today).orElse(null);
 
         if (dm == null) {
-            // First stress entry of the day → start fresh
             dm = DailyMood.builder()
                     .user(user)
                     .date(today)
@@ -160,7 +184,6 @@ public class StressAnalysisService {
                     .overallMood(classifyMood(stress))
                     .build();
         } else {
-            // ⭐ Reset completely for new logs of the day
             dm.setAverageStress(stress);
             dm.setOverallMood(classifyMood(stress));
         }
@@ -168,8 +191,7 @@ public class StressAnalysisService {
         moodRepo.save(dm);
     }
 
-
-    // ⭐ Send alert SMS through your global message service
+    // ⭐ Send alert SMS
     private void sendAlerts(User user, int stress, String mood) {
 
         List<AlertContact> contacts = alertRepo.findByUserId(user.getId());

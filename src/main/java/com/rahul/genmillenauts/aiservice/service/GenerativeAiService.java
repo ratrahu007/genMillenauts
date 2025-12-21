@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,51 +28,74 @@ public class GenerativeAiService {
     private final ChatMessageRepository chatRepo;
     private final UserRepository userRepo;
 
+    // GCP project id
     private static final String PROJECT_ID = "stress1mgmt";
 
-    // ⭐ Guaranteed working region
+    // Vertex AI region
     private static final String LOCATION = "us-central1";
 
-    // ⭐ Guaranteed working model
+    // Gemini model
     private static final String MODEL_NAME = "gemini-2.5-flash";
+
+    // load GCP credentials from Railway ENV instead of system/file
+    private GoogleCredentials loadCredentials() {
+        try {
+            // read full JSON from environment variable
+            String json = System.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON");
+
+            // fail fast if ENV is missing
+            if (json == null || json.isBlank()) {
+                throw new IllegalStateException("GOOGLE_APPLICATION_CREDENTIALS_JSON not set");
+            }
+
+            // create credentials in-memory (no file dependency)
+            return GoogleCredentials.fromStream(
+                    new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))
+            );
+        } catch (Exception e) {
+            log.error("❌ Failed to load GCP credentials from ENV", e);
+            throw new RuntimeException("GCP authentication failed");
+        }
+    }
 
     public ChatResponse getBotReply(ChatRequest request, Long userId) {
         log.info("🟢 Request received from user {}", userId);
 
-        // find user
+        // fetch user
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + userId));
 
         String userMessage = request.getMessage();
 
-        // Load GCP credentials
         try {
-            GoogleCredentials.getApplicationDefault();
-            log.info("✅ Google credentials loaded");
-        } catch (Exception e) {
-            log.error("❌ Failed to load Google ADC", e);
-            return new ChatResponse("Server authentication issue. Please try later.");
-        }
+            // explicitly load credentials from ENV
+            GoogleCredentials credentials = loadCredentials();
 
-        try (VertexAI vertexAI = new VertexAI(PROJECT_ID, LOCATION)) {
+            // build VertexAI client with explicit credentials
+            try (VertexAI vertexAI = new VertexAI.Builder()
+                    .setProjectId(PROJECT_ID)
+                    .setLocation(LOCATION)
+                    .setCredentials(credentials)
+                    .build()) {
 
-            GenerativeModel model = new GenerativeModel(MODEL_NAME, vertexAI);
+                GenerativeModel model = new GenerativeModel(MODEL_NAME, vertexAI);
 
-            GenerateContentResponse response = model.generateContent(userMessage);
+                GenerateContentResponse response = model.generateContent(userMessage);
 
-            String bot = response.getCandidates(0)
-                    .getContent()
-                    .getParts(0)
-                    .getText();
+                String bot = response.getCandidates(0)
+                        .getContent()
+                        .getParts(0)
+                        .getText();
 
-            // SAVE chat messages
-            chatRepo.saveAll(List.of(
-            		new ChatMessage(null, user, userMessage, false, LocalDateTime.now()),
-            	    new ChatMessage(null, user, bot, true, LocalDateTime.now())
-            ));
+                // persist user + bot messages
+                chatRepo.saveAll(List.of(
+                        new ChatMessage(null, user, userMessage, false, LocalDateTime.now()),
+                        new ChatMessage(null, user, bot, true, LocalDateTime.now())
+                ));
 
-            log.info("💬 Bot reply generated successfully");
-            return new ChatResponse(bot);
+                log.info("💬 Bot reply generated successfully");
+                return new ChatResponse(bot);
+            }
 
         } catch (Exception e) {
             log.error("❌ Vertex AI error", e);
