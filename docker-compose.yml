@@ -1,0 +1,67 @@
+
+
+services:
+
+  mysql:
+    image: mysql:8
+    container_name: gen-mysql
+    restart: always
+
+    environment:
+      MYSQL_ROOT_PASSWORD: Rutik@2002
+      MYSQL_DATABASE: genmillenauts
+
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+    networks:
+      - gen-network
+
+  app:
+    build: .
+    container_name: genmillenauts-container
+    restart: always
+
+    ports:
+      - "8080:8080"
+
+    depends_on:
+      - mysql
+
+    environment:
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_PHONE_NUMBER: ${TWILIO_PHONE_NUMBER}
+      TWILIO_MESSAGING_SID: ${TWILIO_MESSAGING_SID}
+
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_API_URL: ${GEMINI_API_URL}
+
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_MODEL: ${OPENAI_MODEL}
+
+      HUGGINGFACE_API_TOKEN: ${HUGGINGFACE_API_TOKEN}
+      HUGGINGFACE_API_URL: ${HUGGINGFACE_API_URL}
+      HUGGINGFACE_MODEL_ID: ${HUGGINGFACE_MODEL_ID}
+
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL}
+      OLLAMA_MODEL: ${OLLAMA_MODEL}
+
+    networks:
+      - gen-network
+
+
+networks:
+  gen-network:
+
+volumes:
+  mysql-data:
