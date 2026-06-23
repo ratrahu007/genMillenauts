@@ -43,30 +43,9 @@ public class StressAnalysisService {
     private final DailyMoodRepository moodRepo;
     private final AlertContactRepository alertRepo;
     private final MessageService messageService;
-
-    private static final String PROJECT_ID = "stress1mgmt";
-    private static final String LOCATION = "us-central1";
-    private static final String MODEL_NAME = "gemini-2.5-flash";
+    private final AiStrategy aiStrategy;
 
     private static final int ALERT_THRESHOLD = 80;
-
-    // Load GCP credentials from ENV variable (JSON content)
-    private GoogleCredentials loadCredentials() {
-        try {
-            String json = System.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON");
-
-            if (json == null || json.isBlank()) {
-                throw new IllegalStateException("GOOGLE_APPLICATION_CREDENTIALS_JSON not set");
-            }
-
-            return GoogleCredentials.fromStream(
-                    new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))
-            );
-        } catch (Exception e) {
-            log.error("Failed to load GCP credentials", e);
-            throw new RuntimeException("GCP authentication failed");
-        }
-    }
 
     // Async entry point
     @Async("stressExecutor")
@@ -114,16 +93,9 @@ public class StressAnalysisService {
         }
     }
 
-    // Generate stress score using Gemini
+    // Generate stress score using the strategy
     private int generateStressScore(String text) {
-
-        GoogleCredentials credentials = loadCredentials();
-
-        // ✅ CORRECT VertexAI usage (NO Builder)
-        try (VertexAI vertexAI = new VertexAI(PROJECT_ID, LOCATION, credentials)) {
-
-            GenerativeModel model = new GenerativeModel(MODEL_NAME, vertexAI);
-
+        try {
             String prompt = """
                 Analyze the emotional stress level of the conversation below.
                 Return ONLY a number between 0 and 100.
@@ -131,12 +103,7 @@ public class StressAnalysisService {
                 Messages:
                 """ + text;
 
-            GenerateContentResponse response = model.generateContent(prompt);
-
-            String output = response.getCandidates(0)
-                    .getContent()
-                    .getParts(0)
-                    .getText();
+            String output = aiStrategy.generateContent(prompt);
 
             String digits = output.replaceAll("[^0-9]", "");
             if (digits.isEmpty()) return 50;
