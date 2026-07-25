@@ -10,4 +10,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 	
     // find all bookings where therapist.id = therapistId
     List<Booking> findByTherapist_Id(Long therapistId);
+
+    // find all bookings where user.id = userId
+    List<Booking> findByUser_Id(Long userId);
 }

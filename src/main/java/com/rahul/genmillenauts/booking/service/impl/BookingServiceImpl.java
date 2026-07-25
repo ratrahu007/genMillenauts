@@ -49,7 +49,6 @@ public class BookingServiceImpl implements BookingService {
 
         log.info("Creating booking for user {}", req.getUserId());
 
-        // Load objects by ID
         User user = userRepository.findById(req.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -59,23 +58,15 @@ public class BookingServiceImpl implements BookingService {
         AvailabilitySlot slot = slotRepository.findById(req.getSlotId())
                 .orElseThrow(() -> new RuntimeException("Slot not found"));
 
-        // Check if already booked
         if (slot.isBooked()) {
             throw new RuntimeException("Slot is already booked");
         }
 
-        // Use factory to build booking (PENDING)
         Booking booking = BookingFactory.createPendingBooking(user, therapist, slot);
 
         Booking saved = bookingRepository.save(booking);
 
-        return BookingResponseDTO.builder()
-                .bookingId(saved.getBookingId())
-                .userId(saved.getUser().getId())
-                .therapistId(saved.getTherapist().getId())
-                .slotId(saved.getSlot().getId())
-                .status(saved.getStatus().name())
-                .build();
+        return mapToResponse(saved);
     }
 
     @Override
@@ -84,77 +75,70 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found"));
 
-        // Update booking status
         booking.setStatus(BookingStatus.CONFIRMED);
         booking.setJitsiRoomUrl(jitsiUrl);
 
-        // Mark slot booked
         AvailabilitySlot slot = booking.getSlot();
         slot.setBooked(true);
         slotRepository.save(slot);
 
         Booking updated = bookingRepository.save(booking);
 
-        return BookingResponseDTO.builder()
-                .bookingId(updated.getBookingId())
-                .userId(updated.getUser().getId())
-                .therapistId(updated.getTherapist().getId())
-                .slotId(updated.getSlot().getId())
-                .status(updated.getStatus().name())
-                .jitsiUrl(updated.getJitsiRoomUrl())
-                .build();
+        return mapToResponse(updated);
     }
 
     @Override
     public BookingResponseDTO getBookingDetails(Long bookingId) {
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new BookingNotFoundException("Booking not found"));
 
-        return BookingResponseDTO.builder()
-                .bookingId(booking.getBookingId())
-
-                .userId(booking.getUser().getId())
-                .userName(booking.getUser().getFullName()) // adjust field name
-
-                .therapistId(booking.getTherapist().getId())
-                .therapistName(booking.getTherapist().getFullName())  // adjust field name
-                .therapistSpeciality(booking.getTherapist().getSpecialization()) // if exists
-
-                .slotId(booking.getSlot().getId())
-                .slotDate(booking.getSlot().getDate().toString())
-                .slotTime(booking.getSlot().getStartTime().toString())
-                .slotTime(booking.getSlot().getEndTime().toString())
-                .status(booking.getStatus().name())
-                .jitsiUrl(booking.getJitsiRoomUrl())
-                .build();
+        return mapToResponse(booking);
     }
-    
-    
+
     @Override
     public List<BookingResponseDTO> getBookingsForTherapist(Long therapistId) {
 
         List<Booking> bookings = bookingRepository.findByTherapist_Id(therapistId);
 
-        return bookings.stream().map(b -> BookingResponseDTO.builder()
-                .bookingId(b.getBookingId())
-                .userId(b.getUser().getId())
-                .userName(b.getUser().getFullName())
-                .therapistId(b.getTherapist().getId())
-                .therapistName(b.getTherapist().getFullName())
-                .therapistSpeciality(b.getTherapist().getSpecialization())
-                .slotId(b.getSlot().getId())
-                .slotDate(b.getSlot().getDate().toString())
-                .slotTime(
-                    b.getSlot().getStartTime().toString() + " - " +
-                    b.getSlot().getEndTime().toString()
-                )
-                .status(b.getStatus().name())
-                .jitsiUrl(b.getJitsiRoomUrl())
-                .build()
-        ).toList();
+        return bookings.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
+    @Override
+    public List<BookingResponseDTO> getBookingsForUser(Long userId) {
+        List<Booking> bookings = bookingRepository.findByUser_Id(userId);
+        return bookings.stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
 
+    /**
+     * Common mapper for Booking -> BookingResponseDTO
+     */
+    private BookingResponseDTO mapToResponse(Booking booking) {
 
+        return BookingResponseDTO.builder()
+                .bookingId(booking.getBookingId())
+
+                .userId(booking.getUser().getId())
+                .userName(booking.getUser().getFullName())
+
+                .therapistId(booking.getTherapist().getId())
+                .therapistName(booking.getTherapist().getFullName())
+                .therapistSpeciality(booking.getTherapist().getSpecialization())
+
+                .slotId(booking.getSlot().getId())
+                .slotDate(booking.getSlot().getDate().toString())
+                .slotTime(
+                        booking.getSlot().getStartTime().toString()
+                                + " - "
+                                + booking.getSlot().getEndTime().toString()
+                )
+
+                .status(booking.getStatus().name())
+                .jitsiUrl(booking.getJitsiRoomUrl())
+                .build();
+    }
 }

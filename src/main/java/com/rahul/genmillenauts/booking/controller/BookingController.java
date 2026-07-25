@@ -18,7 +18,7 @@ import com.rahul.genmillenauts.therapist.service.CustomTherapistDetails;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/booking")
+@RequestMapping("/api/booking")
 @RequiredArgsConstructor
 public class BookingController {
 
@@ -55,5 +55,11 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.getBookingsForTherapist(therapistId));
     }
 
-
+    @GetMapping("/user/my")
+    public ResponseEntity<?> getMyUserBookings(
+            @AuthenticationPrincipal CustomUserDetails loggedInUser
+    ) {
+        Long userId = loggedInUser.getId();
+        return ResponseEntity.ok(bookingService.getBookingsForUser(userId));
+    }
 }

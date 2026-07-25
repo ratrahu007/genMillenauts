@@ -15,7 +15,7 @@ import com.rahul.genmillenauts.payment.service.MockPaymentService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/payment")
+@RequestMapping("api/payment")
 @RequiredArgsConstructor
 public class MockPaymentController {
 

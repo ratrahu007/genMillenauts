@@ -15,4 +15,6 @@ public interface BookingService {
 	
 	 // get all bookings for logged-in therapist
     List<BookingResponseDTO> getBookingsForTherapist(Long therapistId);
+
+    List<BookingResponseDTO> getBookingsForUser(Long userId);
 }
