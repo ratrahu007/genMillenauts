@@ -1,13 +1,14 @@
 package com.rahul.genmillenauts.aiservice.service;
 
+import com.rahul.genmillenauts.aiservice.dto.OpenAiRequest;
+import com.rahul.genmillenauts.aiservice.dto.OpenAiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Component("openai")
@@ -16,50 +17,66 @@ public class OpenAiAiStrategy implements AiStrategy {
     @Value("${openai.api.key}")
     private String apiKey;
 
+    @Value("${openai.api.url}")
+    private String apiUrl;
+
     @Value("${openai.model}")
     private String model;
 
-    private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
 
     public OpenAiAiStrategy(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("https://api.openai.com/v1").build();
+        this.webClientBuilder = webClientBuilder;
     }
 
     @Override
     public String generateContent(String prompt) {
+
         log.info("Generating content using OpenAI model: {}", model);
 
-        try {
-            Map<String, Object> requestBody = Map.of(
-                    "model", model,
-                    "messages", List.of(
-                            Map.of("role", "user", "content", prompt)
-                    )
-            );
+        OpenAiRequest request = new OpenAiRequest(
+                model,
+                List.of(
+                        new OpenAiRequest.Message(
+                                "user",
+                                prompt
+                        )
+                )
+        );
 
-            Map<String, Object> response = webClient.post()
+        try {
+
+            WebClient webClient = webClientBuilder
+                    .baseUrl(apiUrl)
+                    .build();
+
+            OpenAiResponse response = webClient.post()
                     .uri("/chat/completions")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + apiKey)
-                    .bodyValue(requestBody)
+                    .bodyValue(request)
                     .retrieve()
-                    .bodyToMono(Map.class)
-                    .onErrorResume(e -> {
-                        log.error("OpenAI API call failed", e);
-                        return Mono.empty();
-                    })
+                    .bodyToMono(OpenAiResponse.class)
                     .block();
 
-            if (response == null || !response.containsKey("choices")) {
-                throw new RuntimeException("Empty response from OpenAI");
+            if (response == null
+                    || response.choices() == null
+                    || response.choices().isEmpty()
+                    || response.choices().get(0).message() == null
+                    || response.choices().get(0).message().content() == null) {
+
+                throw new RuntimeException("No response received from OpenAI.");
             }
 
-            List<Map<String, Object>> choices = (List<Map<String, Object>>) response.get("choices");
-            Map<String, Object> message = (Map<String, Object>) choices.get(0).get("message");
-            return (String) message.get("content");
+            return response.choices()
+                    .get(0)
+                    .message()
+                    .content();
 
         } catch (Exception e) {
-            log.error("OpenAI generation failed", e);
-            throw new RuntimeException("OpenAI generation failed", e);
+            log.error("Error while calling OpenAI API", e);
+            throw new RuntimeException("Failed to generate AI response.", e);
         }
     }
 }
