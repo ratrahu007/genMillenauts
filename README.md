@@ -61,6 +61,30 @@ The application is fully containerized using Docker and deployed on Microsoft Az
 
 ---
 
+## 📚 API Documentation
+
+The GenMillenauts backend is fully documented using **OpenAPI (Swagger)**, allowing developers to explore and test every REST endpoint through an interactive interface.
+
+### 🔗 Live Swagger UI
+
+https://genmillenauts.happyfield-fc9e256d.centralindia.azurecontainerapps.io/swagger-ui/index.html
+
+### 🔗 OpenAPI Specification (JSON)
+
+https://genmillenauts.happyfield-fc9e256d.centralindia.azurecontainerapps.io/v3/api-docs
+
+### Features
+
+- ✅ Interactive API testing
+- 🔐 JWT Authentication support
+- 📦 Request & Response schemas
+- 📖 OpenAPI 3.0 documentation
+- 🧪 Try APIs directly from the browser
+
+> **Note:** Protected endpoints require authentication. Use the **Authorize** button and provide a valid JWT access token after logging in.
+
+![Swagger UI](screenshots/swagger-ui.png)
+
 # ✨ Features
 
 ## 🔐 Authentication
