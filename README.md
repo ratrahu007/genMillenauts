@@ -1,241 +1,270 @@
-🧠 GenMillenauts – Mental Awareness Platform
+<div align="center">
 
-A full-stack mental wellness platform designed to provide accessible psychological support using secure therapy booking, AI-powered mental health analysis, and real-time notifications, built with Spring Boot, Google Cloud Vertex AI, and modern cloud-native architecture.
+# 🧠 GenMillenauts
+### AI-Powered Mental Wellness Platform
 
-🚀 Project Overview
+A production-ready full-stack mental wellness platform built using **Spring Boot**, **React**, **Azure AI Foundry**, **Docker**, and **Azure Container Apps**.
 
-GenMillenauts is a modular mental awareness platform that combines human therapy services with AI-driven mental health insights.
-The system helps users detect early stress patterns, receive AI-based guidance, and connect with professional therapists in a secure and scalable way.
+<p align="center">
+    <img src="https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=openjdk">
+    <img src="https://img.shields.io/badge/Spring_Boot-3.x-success?style=for-the-badge&logo=springboot">
+    <img src="https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react">
+    <img src="https://img.shields.io/badge/Docker-Containerized-blue?style=for-the-badge&logo=docker">
+    <img src="https://img.shields.io/badge/Azure-Container_Apps-0078D4?style=for-the-badge&logo=microsoftazure">
+    <img src="https://img.shields.io/badge/MySQL-Database-4479A1?style=for-the-badge&logo=mysql">
+</p>
 
-✨ Key Features
+🌐 **Live Demo:** https://genmillenauts.social
 
-🔐 Authentication & Security
+</div>
 
-JWT-based authentication
+---
 
-BCrypt password encryption
+# 📖 Overview
 
-Role-based access control (User / Therapist / Admin)
+GenMillenauts is an AI-powered mental wellness platform designed to make mental healthcare more accessible and engaging.
 
-Secure stateless APIs
+Users can connect with therapists, book appointments, attend video consultations, track their daily mood, monitor stress levels, and interact with an AI assistant for emotional support.
 
+The application is fully containerized using Docker and deployed on Microsoft Azure using Azure Container Apps with Azure Database for MySQL.
 
+---
 
+# 🚀 Project Highlights
 
-👤 User Service
+- ✅ Production Ready
+- ✅ Dockerized Frontend & Backend
+- ✅ Azure Container Apps Deployment
+- ✅ Azure Database for MySQL
+- ✅ Azure AI Foundry Integration
+- ✅ JWT Authentication
+- ✅ Secure REST APIs
+- ✅ HTTPS Enabled
+- ✅ Custom Domain Configuration
+- ✅ Responsive React UI
 
-User registration & login
+---
 
-Profile management
+# 📸 Application Preview
 
-Session history tracking
+| Home | User Dashboard |
+|------|------|
+| ![](screenshots/homepage.png) | ![](screenshots/userDashboard.png) |
 
+| Therapist Dashboard | Slot Booking |
+|------|------|
+| ![](screenshots/therapistDashboard.png) | ![](screenshots/slot.png) |
 
+| AI Chat |
+|------|
+| ![](screenshots/Aichat.png) |
 
-🧑‍⚕️ Therapist Service
+---
 
-Therapist onboarding & profile management
+# ✨ Features
 
-Availability scheduling
+## 🔐 Authentication
 
-Expertise-based tagging
+- User Registration
+- Secure Login
+- JWT Authentication
+- BCrypt Password Encryption
+- Protected REST APIs
 
+---
 
+## 👨‍⚕️ Therapist Module
 
-📅 Booking Service
+- Therapist Profiles
+- Experience & Specialization
+- Consultation Fee
+- Availability Management
+- Slot Management
 
-Therapist appointment booking
+---
 
-Slot conflict validation
+## 📅 Appointment Booking
 
-Booking lifecycle management
+- View Available Slots
+- Book Appointment
+- Booking History
+- Cancel Booking
+- Booking Status
 
+---
 
+## 🎥 Video Consultation
 
-💳 Payment Service
+- Online Video Consultation
+- Secure Session Access
 
-Secure session payment handling
+---
 
-Payment status tracking
+## 😊 Mood Tracking
 
+- Daily Mood Logging
+- Emotional Monitoring
 
+---
 
-🧠 AI Mental Health Service (Core Innovation)
+## 📊 Stress Tracking
 
-AI-powered stress & emotion analysis
+- Record Daily Stress
+- AI Assisted Support
 
-Mental health chat analysis
+---
 
-Personalized AI-generated coping suggestions
+## 🤖 AI Chat Assistant
 
-Early detection of high-risk mental health signals
+- Azure AI Foundry Integration
+- AI Powered Conversations
+- Emotional Wellness Support
 
+---
 
+# 🏗️ System Architecture
 
-🔔 Notifications
+<p align="center">
+<img src="docs/architecture.jpg" width="100%">
+</p>
 
-SMS notifications using Twilio
+---
 
-Email alerts using Spring Mail
+# ☁️ Azure Deployment Architecture
 
-Booking confirmations & reminders
+<p align="center">
+<img src="docs/deployment.png" width="100%">
+</p>
 
+---
 
+# 🛠️ Tech Stack
 
-⚙️ Asynchronous Processing
+## Backend
 
-AI processing & notification handling
+- Java 17
+- Spring Boot
+- Spring Security
+- Spring Data JPA
+- Hibernate
+- JWT
+- Maven
 
+### Frontend
 
+- React
+- Vite
+- Redux Toolkit
+- Axios
+- CSS
 
+### Database
 
-☁️ Google Cloud & Vertex AI Integration
+- MySQL
 
-The AI capabilities are powered using Google Cloud Platform (GCP) and Vertex AI.
+### AI
 
-Why Vertex AI?
+- Azure AI Foundry
 
-Enterprise-grade security
+### DevOps
 
-Scalable AI inference
+- Docker
+- Docker Hub
+- Azure Container Apps
+- Nginx
 
-Managed access to Gemini / LLM models
+### Cloud
 
-Suitable for sensitive mental health data
+- Azure Database for MySQL
+- Azure DNS
+- HTTPS / SSL
+- Custom Domain
 
+---
 
+# 📂 Project Structure
 
-AI Workflow
-
-User Input
-   ↓
-Spring Boot AI Service
-   ↓
-Vertex AI (Gemini / Model Endpoint)
-   ↓
-Stress Analysis + Insights
-   ↓
-User Dashboard / Alerts
-
-
-
-
-🔐 GCP IAM & Authentication (Important)
-
-Instead of hardcoding API keys, this project uses IAM-based authentication.
-
-Steps Used:
-
-Created a GCP Service Account
-
-Assigned required roles:
-
-Vertex AI User
-
-Vertex AI Viewer
-
-
-Downloaded the service account JSON key
-
-Set system environment variable:
-
-Windows
-setx GOOGLE_APPLICATION_CREDENTIALS "C:\path\to\service-account.json"
-
-
-Linux / macOS
-export GOOGLE_APPLICATION_CREDENTIALS="/path/to/service-account.json"
-
-
-✔ This allows the application to securely access Vertex AI without exposing secrets.
-
-📦 GCP & Vertex AI Maven Dependencies
-<!-- Google Cloud Vertex AI -->
-<dependency>
-  <groupId>com.google.cloud</groupId>
-  <artifactId>google-cloud-vertexai</artifactId>
-  <version>1.38.0</version>
-</dependency>
-
-<!-- Google Auth Library -->
-<dependency>
-  <groupId>com.google.auth</groupId>
-  <artifactId>google-auth-library-oauth2-http</artifactId>
-  <version>1.23.0</version>
-</dependency>
-
-🏗️ Project Structure
-src/main/java/com/rahul/genmillenauts
+```
+GenMillenauts
 │
-├── aiservice        # Vertex AI & AI logic
-├── userservice     # User authentication & profiles
-├── therapist       # Therapist management
-├── booking         # Appointment booking
-├── payment         # Payment handling
-├── common          # Shared utilities
-├── global          # Global configs & exception handling
+├── backend
+├── src
+├── docs
+├── screenshots
+├── docker
+├── README.md
+└── LICENSE
+```
 
-⚙️ Tech Stack
+---
 
-Backend: Java 21, Spring Boot
+# 🚀 Getting Started
 
-Security: Spring Security, JWT, BCrypt
+## Clone Repository
 
-AI: Vertex AI (Gemini models)
+```bash
+git clone https://github.com/ratrahu007/GenMillenauts.git
+```
 
-Cloud: Google Cloud Platform
+## Backend
 
-Database: MySQL
+```bash
+cd backend
+mvn clean install
+mvn spring-boot:run
+```
 
-Messaging: RabbitMQ
+## Frontend
 
-Notifications: Twilio (SMS), Spring Mail (Email)
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-Build Tool: Maven
+---
 
+# 🌍 Production Deployment
 
+| Service | Technology |
+|----------|------------|
+| Frontend | React + Nginx |
+| Backend | Spring Boot |
+| Containers | Docker |
+| Cloud | Azure Container Apps |
+| Database | Azure Database for MySQL |
+| AI | Azure AI Foundry |
+| Domain | genmillenauts.social |
+| HTTPS | SSL Enabled |
 
-▶️ Running the Project
-Prerequisites
+---
 
-Java 21
+# 📈 Future Improvements
 
-Maven
+- Google OAuth
+- Payment Gateway
+- Email Notifications
+- Admin Analytics
+- AI Mood Prediction
+- Mobile Application
 
-MySQL
+---
 
-RabbitMQ
+# 👨‍💻 Author
 
-Google Cloud account with Vertex AI enabled
+**Rahul Rathod**
 
-Run Command
-./mvnw spring-boot:run
+Java Full Stack Developer
 
+- GitHub: https://github.com/ratrahu007
+- LinkedIn:www.linkedin.com/in/rahul-rathod-4742982a6
 
-Application will start at:
+---
 
-http://localhost:8080
+<div align="center">
 
+### ⭐ If you like this project, consider giving it a Star!
 
+Built with ❤️ using Java, Spring Boot, React & Microsoft Azure
 
-💡 Why This Project Matters
-
-Demonstrates real-world cloud IAM security
-
-Shows AI + healthcare domain responsibility
-
-Uses production-grade Spring Boot architecture
-
-Integrates GCP Vertex AI in Java (rare & valuable skill)
-
-📌 Future Enhancements
-Advanced therapist recommendation engine
-
-Multilingual AI support
-
-Crisis escalation workflows
-
-👨‍💻 Author
-
-Rahul
-Full-Stack Java Developer | Cloud & AI Enthusiast
+</div>
