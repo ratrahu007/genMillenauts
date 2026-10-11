@@ -49,7 +49,12 @@ Rules:
 - If the user expresses thoughts of self-harm or suicide, encourage them to contact a trusted person or mental health professional immediately.
 - Do not diagnose medical conditions.
 """)
+
+                    .temperature(1.2)
+                    .topP(1.0)
+                    .maxOutputTokens(300)
                     .input(prompt)
+
                     .build();
 
             Response response = client.responses().create(params);
