@@ -30,7 +30,7 @@ public class AuthController {
     // ✅ REGISTER
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
-        log.info("Received register request: {}", request);
+        log.info("Registration request received");
 
         User user = User.builder()
                 .email(request.getEmail())
@@ -58,8 +58,7 @@ public class AuthController {
     // ✅ LOGIN
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
-        log.info("📩 Received login request for: {}", 
-                 request.getEmail() != null ? request.getEmail() : request.getMobile());
+        log.info("Login Request received");
 
         LoginResponse response = userService.login(
                 request.getEmail(),
@@ -67,7 +66,7 @@ public class AuthController {
                 request.getPassword()
         );
 
-        log.info("✅ User logged in successfully: {}", response.getEmail());
+        log.info("✅ User logged in successfully:");
         return ResponseEntity.ok(Map.of(
                 "success", true,
                 "message", "Login successful",

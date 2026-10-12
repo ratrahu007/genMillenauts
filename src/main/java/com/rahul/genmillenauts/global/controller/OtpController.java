@@ -26,7 +26,7 @@ public class OtpController {
     // ---------------------- Send OTP ----------------------
     @PostMapping("/send-otp")
     public ResponseEntity<OtpResponse> sendOtp(@Valid @RequestBody SendOtpRequest request) {
-        log.info("Received send-otp request: {}", request);
+        log.info("Received send-otp request:");
 
         try {
             otpService.sendOtp(request.getEmail(), request.getMobile());
@@ -40,7 +40,7 @@ public class OtpController {
     // ---------------------- Verify OTP ----------------------
     @PostMapping("/verify-otp")
     public ResponseEntity<Map<String, Object>> verifyOtp(@Valid @RequestBody VerifyOtpRequest request) {
-        log.info("Received verify-otp request: {}", request);
+        log.info("Received verify-otp request: ");
 
         String result = otpService.verifyOtp(request.getEmail(), request.getMobile(), request.getOtp());
 

@@ -40,7 +40,7 @@ public class SlotController {
             @RequestBody SlotRequest req
     ) {
         try {
-            log.info("📥 /slots/generate → Therapist: {}", therapist);
+            log.info("Calling Api for generating Slots  ");
 
             if (therapist == null) {
                 log.error("❌ Therapist = NULL (token not sent or expired)");
@@ -48,12 +48,12 @@ public class SlotController {
             }
 
             slotService.generateSlots(therapist.getId(), req);
-            log.info("✅ Slots generated successfully for therapist {}", therapist.getId());
+            log.info("✅ Slots generated successfully for therapist ");
 
             return new ApiResponse(true, "Slots generated successfully!");
 
         } catch (Exception e) {
-            log.error("❌ Error in /slots/generate: {}", e.getMessage(), e);
+            log.error("❌ Error in /slots/generate: ");
             return new ApiResponse(false, e.getMessage());
         }
     }
@@ -66,17 +66,17 @@ public class SlotController {
     public Object fetchSlotsForUsers(@RequestBody SlotFetchRequest req) {
         try {
         	   Long therapistId = req.getTherapistId();
-            log.info("📥 /slots/public/fetch → therapistId: {}", therapistId);
+            log.info("📥 /slots/public/fetch → therapistId: ");
             
 
             List<AvailabilitySlot> slots = slotService.getSlotsForTherapist(therapistId);
 
-            log.info("📤 PUBLIC fetched {} slots for therapist {}", slots.size(), therapistId);
+            log.info("📤 PUBLIC fetched  slots for therapist ");
 
             return slots;
 
         } catch (Exception e) {
-            log.error("❌ Error in /slots/public/fetch: {}", e.getMessage(), e);
+            log.error("❌ Error in /slots/public/fetch: ");
             return new ApiResponse(false, e.getMessage());
         }
     }
@@ -89,7 +89,7 @@ public class SlotController {
             @AuthenticationPrincipal CustomTherapistDetails therapist
     ) {
         try {
-            log.info("📥 /slots/fetch → Therapist: {}", therapist);
+            log.info("📥 /slots/fetch → Therapist: ");
 
             if (therapist == null) {
                 log.error("❌ Therapist = NULL (frontend missing Authorization header)");
@@ -97,7 +97,7 @@ public class SlotController {
             }
 
             List<AvailabilitySlot> slots = slotService.getSlotsForTherapist(therapist.getId());
-            log.info("📤 Fetched {} slots for therapist {}", slots.size(), therapist.getId());
+            log.info("📤 Fetched  slots for therapist ");
 
             return slots;
 
