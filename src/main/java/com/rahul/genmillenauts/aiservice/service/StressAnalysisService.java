@@ -30,8 +30,8 @@ public class StressAnalysisService {
     private final ChatMessageRepository chatRepo;
     private final StressLogRepository stressRepo;
     private final DailyMoodRepository moodRepo;
-    private final AlertContactRepository alertRepo;
-    private final MessageService messageService;
+
+
 
     private final Map<String, AiStrategy> aiStrategies;
 
@@ -77,11 +77,9 @@ public class StressAnalysisService {
 
             updateDailyMood(user, stress);
 
-            if (stress >= ALERT_THRESHOLD) {
-                sendAlerts(user, stress, mood);
-            }
 
-            log.info("Stress analysis completed for user {} | Stress={}", userId, stress);
+
+            log.info("Stress analysis completed for user  Stress");
 
         } catch (Exception e) {
             log.error("Async stress analysis failed for user {}", userId, e);
@@ -94,9 +92,9 @@ public class StressAnalysisService {
 
             String prompt = """
                     Analyze the emotional stress level of the conversation below.
-
+                    
                     Return ONLY a number between 0 and 100.
-
+                    
                     Messages:
                     """ + text;
 
@@ -160,28 +158,5 @@ public class StressAnalysisService {
         moodRepo.save(dm);
     }
 
-    private void sendAlerts(User user, int stress, String mood) {
-
-        List<AlertContact> contacts = alertRepo.findByUserId(user.getId());
-
-        String body = """
-                URGENT ALERT:
-                %s is showing signs of emotional distress.
-                Stress Index: %d
-                Mood: %s
-                Please check on them immediately.
-                """.formatted(user.getFullName(), stress, mood);
-
-        for (AlertContact contact : contacts) {
-
-            try {
-
-                messageService.sendAlertSms(contact.getPhone(), body);
-
-            } catch (Exception e) {
-
-                log.error("Failed to send alert to {}", contact.getPhone(), e);
-            }
-        }
-    }
 }
+

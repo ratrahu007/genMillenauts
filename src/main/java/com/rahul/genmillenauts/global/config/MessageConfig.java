@@ -1,5 +1,6 @@
 package com.rahul.genmillenauts.global.config;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +9,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
+@Getter
 @Configuration
 public class MessageConfig {
 
@@ -25,23 +27,14 @@ public class MessageConfig {
     private int mailPort;
 
     // ===== Twilio =====
-    @Value("${twilio.account-sid}")
-    private String accountSid;
 
-    @Value("${twilio.auth-token}")
-    private String authToken;
-
-    @Value("${twilio.messaging-sid}")
-    private String messagingSid;
 
     public String getMailUsername() { return mailUsername; }
     public String getMailPassword() { return mailPassword; }
     public String getMailHost() { return mailHost; }
     public int getMailPort() { return mailPort; }
 
-    public String getAccountSid() { return accountSid; }
-    public String getAuthToken() { return authToken; }
-    public String getMessagingSid() { return messagingSid; }
+
 
     @Bean
     public JavaMailSender javaMailSender() {
@@ -55,7 +48,7 @@ public class MessageConfig {
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.debug", "true");
+        props.put("mail.debug", "false");
 
         return mailSender;
     }

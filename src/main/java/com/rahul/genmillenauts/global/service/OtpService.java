@@ -42,8 +42,7 @@ public class OtpService {
 
         if (email != null)
             messageService.sendEmail(email, "Your OTP", "Your verification code is: " + otp);
-        if (mobile != null)
-            messageService.sendOtpSms(mobile, "Your verification code is: " + otp);
+
     }
 
     // ---------------------- Verify OTP ----------------------

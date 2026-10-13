@@ -33,15 +33,6 @@ public class AlertContactService {
 
         AlertContact saved = alertContactRepository.save(contact);
         dto.setId(saved.getId());
-
-        // ✅ SMS notification
-        String alertMsg = "You have been added as an alert contact for user: " + user.getFullName();
-        try {
-            messageService.sendAlertSms(contact.getPhone(), alertMsg);
-        } catch (Exception e) {
-            System.out.println("⚠ Failed to send SMS to " + contact.getPhone());
-        }
-
         return dto;
     }
 

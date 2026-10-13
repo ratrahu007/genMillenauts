@@ -19,29 +19,7 @@ public class MessageService {
         this.mailSender = mailSender;
         this.config = config;
 
-        // Initialize Twilio
-        Twilio.init(config.getAccountSid(), config.getAuthToken());
-    }
 
-    // ==================== SMS ====================
-    public void sendOtpSms(String to, String otp) {
-        sendSms(to, "Your OTP is: " + otp);
-    }
-
-    public void sendAlertSms(String to, String alertMsg) {
-        sendSms(to, "⚠ ALERT: " + alertMsg);
-    }
-
-    public void sendOfferSms(String to, String offerMsg) {
-        sendSms(to, "🎉 Special Offer: " + offerMsg);
-    }
-
-    private void sendSms(String to, String body) {
-        Message.creator(
-                new PhoneNumber(to),
-                new PhoneNumber(config.getMessagingSid()),
-                body
-        ).create();
     }
 
     // ==================== Email ====================
