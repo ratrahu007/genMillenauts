@@ -26,38 +26,7 @@
 
     <dependencies>
 
-      <!-- Vertex AI Java Client -->
-<dependency>
-    <groupId>com.google.cloud</groupId>
-    <artifactId>google-cloud-vertexai</artifactId>
-    <version>0.6.0</version>
-</dependency>
 
-<!-- Required Google Auth Library -->
-<dependency>
-    <groupId>com.google.auth</groupId>
-    <artifactId>google-auth-library-oauth2-http</artifactId>
-    <version>1.27.0</version>
-</dependency>
-
-<!-- GRPC (MATCHING VERSION — VERY IMPORTANT) -->
-<dependency>
-    <groupId>io.grpc</groupId>
-    <artifactId>grpc-netty-shaded</artifactId>
-    <version>1.62.2</version>
-</dependency>
-
-<dependency>
-    <groupId>io.grpc</groupId>
-    <artifactId>grpc-core</artifactId>
-    <version>1.62.2</version>
-</dependency>
-
-<dependency>
-    <groupId>io.grpc</groupId>
-    <artifactId>grpc-auth</artifactId>
-    <version>1.62.2</version>
-</dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -131,18 +100,6 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Twilio -->
-        <dependency>
-            <groupId>com.twilio.sdk</groupId>
-            <artifactId>twilio</artifactId>
-            <version>9.13.0</version>
-        </dependency>
-
-        <!-- RabbitMQ -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-amqp</artifactId>
-        </dependency>
 
         <!-- Testing -->
         <dependency>
