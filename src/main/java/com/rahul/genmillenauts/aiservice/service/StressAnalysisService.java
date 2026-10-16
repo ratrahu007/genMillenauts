@@ -5,10 +5,9 @@ import com.rahul.genmillenauts.aiservice.entity.StressLog;
 import com.rahul.genmillenauts.aiservice.repository.ChatMessageRepository;
 import com.rahul.genmillenauts.aiservice.repository.DailyMoodRepository;
 import com.rahul.genmillenauts.aiservice.repository.StressLogRepository;
-import com.rahul.genmillenauts.global.service.MessageService;
-import com.rahul.genmillenauts.userservice.entity.AlertContact;
+
 import com.rahul.genmillenauts.userservice.entity.User;
-import com.rahul.genmillenauts.userservice.repository.AlertContactRepository;
+
 import com.rahul.genmillenauts.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

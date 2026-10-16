@@ -3,7 +3,7 @@ package com.rahul.genmillenauts.therapist.entity;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import com.google.auto.value.AutoValue.Builder;
+import lombok.Builder;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
