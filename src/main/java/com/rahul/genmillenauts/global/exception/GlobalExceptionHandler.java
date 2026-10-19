@@ -16,7 +16,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler   {
 
     // ✅ 1. Handle @Valid validation errors (bad request 400)
     @ExceptionHandler(MethodArgumentNotValidException.class)

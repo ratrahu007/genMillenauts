@@ -10,7 +10,7 @@ public class VerifyOtpRequest {
     @Email(message = "Invalid email format")
     private String email;
 
-    @Size(min = 10, max = 15, message = "Mobile number must be 10-15 digits")
+    @Size(min = 10, message = "Mobile number must be 10 digits")
     private String mobile;
 
     @NotBlank(message = "OTP must not be blank")
